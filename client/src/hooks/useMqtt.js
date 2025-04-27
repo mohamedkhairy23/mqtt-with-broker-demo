@@ -6,6 +6,8 @@ const useMqtt = () => {
   const topic = import.meta.env.VITE_MQTT_TOPIC;
   const apiUrl = import.meta.env.VITE_API_URL;
 
+  console.log(brokerUrl, top, apiUrl);
+
   const [messages, setMessages] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
 

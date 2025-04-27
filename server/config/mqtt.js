@@ -1,21 +1,23 @@
+require("dotenv").config();
 const mqtt = require("mqtt");
-const SensorData = require("../models/SensorData");
+const SensorData = require("../models/SensorData"); // <== You must import it
 
 const client = mqtt.connect(process.env.MQTT_BROKER);
 
 client.on("connect", () => {
-  console.log(`Connected to MQTT Broker at ${process.env.MQTT_BROKER}`);
-  client.subscribe(process.env.MQTT_TOPIC, (err) => {
+  console.log(`Connected to MQTT Broker: ${process.env.MQTT_BROKER}`);
+
+  client.subscribe(process.env.MQTT_TOPIC, { qos: 0 }, (err, granted) => {
     if (err) {
-      console.error("MQTT Subscription Failed:", err);
+      console.error("Subscription error:", err);
     } else {
-      console.log(`Subscribed to topic: ${process.env.MQTT_TOPIC}`);
+      console.log(`Subscribed to:`, granted);
     }
   });
 });
 
 client.on("message", async (topic, message) => {
-  console.log(`Received: ${message.toString()} on topic ${topic}`);
+  console.log(`📩 Received on topic [${topic}]: ${message.toString()}`);
 
   try {
     const newData = new SensorData({
@@ -29,4 +31,6 @@ client.on("message", async (topic, message) => {
   }
 });
 
-module.exports = client;
+client.on("error", (err) => {
+  console.error("MQTT Client Error:", err);
+});
